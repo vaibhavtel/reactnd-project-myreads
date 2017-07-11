@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import {debounce} from "lodash";
 import { Link } from "react-router-dom";
 import sortBy from "sort-by";
@@ -14,7 +13,9 @@ class SearchPage extends React.Component {
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeDebounced = debounce(this.handleChange, 200);
+        this.addBookToShelf = this.addBookToShelf.bind(this);
     }
+
     handleChange(searchTerm) {
         if (searchTerm.length) {
             BooksAPI.search(searchTerm, 100).then(searchResults => {
@@ -28,6 +29,12 @@ class SearchPage extends React.Component {
             this.setState({searchResults: []});
         }
     }
+
+    addBookToShelf(book, newShelf) {
+        BooksAPI.update(book, newShelf).then(() => {
+        });    
+    }
+
     render() {
         return (
             <div className="search-books">
@@ -44,16 +51,12 @@ class SearchPage extends React.Component {
                     <BookShelf
                         bookShelfTitle="Search Results"
                         books={this.state.searchResults.sort(sortBy( "title"))}
-                        changeShelf={this.props.changeShelf}
+                        changeShelf={this.addBookToShelf}
                     />
                 </div>
             </div>
         )
     }
-}
-
-SearchPage.propTypes = {
-    changeShelf: PropTypes.func.isRequired
 }
 
 export default SearchPage;
