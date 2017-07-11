@@ -25,7 +25,7 @@ const Book = (props) => {
             <div className="book-top">
                 <div className="book-cover" style={{backgroundImage: `url(${book.imageLinks.smallThumbnail})` }} alt={book.title}></div>
                 <div className="book-shelf-changer">
-                    <select onChange={changeShelf} defaultValue="">
+                    <select onChange={changeShelf} value={book.shelf}>
                         <option value="" disabled>Move to...</option>
                         <option value="currentlyReading">Currently Reading</option>
                         <option value="wantToRead">Want to Read</option>

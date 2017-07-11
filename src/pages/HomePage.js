@@ -8,53 +8,35 @@ class HomePage extends React.Component {
     constructor() {
         super();
         this.state = {
-            books: [],
-            currentlyReading:[],
-            read:[],
-            wantToRead:[]
+            books: []
         };
-        this.categorizeBooks = this.categorizeBooks.bind(this);
         this.changeShelf = this.changeShelf.bind(this);
-    }
-
-    categorizeBooks(books) {
-        const currentlyReading = [],
-            read = [],
-            wantToRead = [];
-        if (books.length) {
-            books.forEach((book) => {
-                if (book.shelf === "currentlyReading") {
-                    currentlyReading.push(book);
-                } else if (book.shelf === "read") {
-                    read.push(book);
-                } else if (book.shelf === "wantToRead") {
-                    wantToRead.push(book);
-                }
-            });
-            this.setState({books: books, currentlyReading: currentlyReading, read: read, wantToRead: wantToRead});
-        }
     }
 
     componentDidMount() {
         BooksAPI.getAll().then((books) => {
-            this.categorizeBooks(books);
+            this.setState({books});
         });
     }
 
     changeShelf(book, newShelf) {
         const bookId = book.id;
         BooksAPI.update(book, newShelf).then(() => {
-            const books = this.state.books.map(book => {
-                if (book.id === bookId) {
-                    book.shelf = newShelf;
-                }
-                return book;
+            this.setState(oldState => {
+                return {books: oldState.books.map(book => {
+                    if (book.id === bookId) {
+                        book.shelf = newShelf;
+                    }
+                    return book;
+                })};
             });
-            this.categorizeBooks(books);
         });
     }
 
     render() {
+        const wantToRead = this.state.books.filter(book => book.shelf === "wantToRead");
+        const currentlyReading = this.state.books.filter(book => book.shelf === "currentlyReading");
+        const read = this.state.books.filter(book => book.shelf === "read");
         return (
             <div className="list-books">
                 <div className="list-books-title">
@@ -63,17 +45,17 @@ class HomePage extends React.Component {
                 <div className="list-books-content">
                     <BookShelf
                         bookShelfTitle="Currently Reading"
-                        books={this.state.currentlyReading.sort(sortBy( "title"))}
+                        books={currentlyReading.sort(sortBy( "title"))}
                         changeShelf={this.changeShelf}
                     />
                     <BookShelf
                         bookShelfTitle="Want to Read"
-                        books={this.state.wantToRead.sort(sortBy( "title"))}
+                        books={wantToRead.sort(sortBy( "title"))}
                         changeShelf={this.changeShelf}
                     />
                     <BookShelf
                         bookShelfTitle="Read"
-                        books={this.state.read.sort(sortBy( "title"))}
+                        books={read.sort(sortBy( "title"))}
                         changeShelf={this.changeShelf}
                     />
                 </div>

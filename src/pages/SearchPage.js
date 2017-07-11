@@ -31,8 +31,17 @@ class SearchPage extends React.Component {
     }
 
     addBookToShelf(book, newShelf) {
+        const bookId = book.id;
         BooksAPI.update(book, newShelf).then(() => {
-        });    
+            this.setState(oldState => {
+                return {books: oldState.books.map(book => {
+                    if (book.id === bookId) {
+                        book.shelf = newShelf;
+                    }
+                    return book;
+                })};
+            });
+        });   
     }
 
     render() {
