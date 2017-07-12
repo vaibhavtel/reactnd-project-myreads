@@ -5,12 +5,18 @@ import SearchPage from "./pages/SearchPage";
 import HomePage from "./pages/HomePage";
 import "./index.css";
 
+const App = () => {
+    return (
+        <BrowserRouter>
+            <div className="app">
+                <Route exact path="/" component={HomePage} />
+                <Route exact path="/search" component={SearchPage} />
+            </div>
+        </BrowserRouter>    
+    );
+};
+
 ReactDOM.render(
-    <BrowserRouter>
-        <div className="app">
-            <Route exact path="/" component={HomePage} />
-            <Route exact path="/search" component={SearchPage} />
-        </div>
-    </BrowserRouter>,
+    <App />,
     document.getElementById("root")
 );

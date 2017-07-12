@@ -6,45 +6,65 @@ import * as BooksAPI from "../BooksAPI";
 import BookShelf from "../components/BookShelf";
 
 class SearchPage extends React.Component {
-    constructor() {
-        super();
-        this.state = {
-            searchResults: []
-        };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleChangeDebounced = debounce(this.handleChange, 200);
-        this.addBookToShelf = this.addBookToShelf.bind(this);
+    state = {
+        searchResults: [],
+        books: []
     }
 
-    handleChange(searchTerm) {
+    isBookOnShelf = (bookId) => {
+        return this.state.books.filter(book => book.id === bookId);
+    }
+
+    handleChange = (searchTerm) => {
         if (searchTerm.length) {
             BooksAPI.search(searchTerm, 100).then(searchResults => {
                 if (searchResults.length) {
-                    this.setState({searchResults});
+                    this.setState({
+                        searchResults: searchResults.map(book => {
+                            const isBookOnShelf = this.isBookOnShelf(book.id);
+                            if (isBookOnShelf.length) {
+                                book.shelf = isBookOnShelf[0].shelf;
+                            }
+                            return book;
+                        })
+                    });
                 } else {
-                    this.setState({searchResults: []});
+                    this.setState({
+                        searchResults: []
+                    });
                 }
             });
-        } else if (this.state.searchResults.length){
-            this.setState({searchResults: []});
+        } else if (this.state.searchResults.length) {
+            this.setState({
+                searchResults: []
+            });
         }
     }
 
-    addBookToShelf(book, newShelf) {
+    componentDidMount() {
+        BooksAPI.getAll().then(books => {
+            this.setState({books});
+        });
+    }
+
+    addBookToShelf = (book, newShelf) => {
         const bookId = book.id;
         BooksAPI.update(book, newShelf).then(() => {
             this.setState(oldState => {
-                return {books: oldState.books.map(book => {
-                    if (book.id === bookId) {
-                        book.shelf = newShelf;
-                    }
-                    return book;
-                })};
+                return {
+                    books: oldState.searchResults.map(book => {
+                        if (book.id === bookId) {
+                            book.shelf = newShelf;
+                        }
+                        return book;
+                    })
+                };
             });
-        });   
+        });
     }
 
     render() {
+        const handleChangeDebounced = debounce(this.handleChange, 200);
         return (
             <div className="search-books">
                 <div className="search-books-bar">
@@ -53,7 +73,7 @@ class SearchPage extends React.Component {
                         Close
                     < /Link>
                     <div className="search-books-input-wrapper">
-                        <input type="text" autoFocus placeholder="Search by title or author" onChange={event => this.handleChangeDebounced(event.target.value.trim())} />
+                        <input type="text" autoFocus placeholder="Search by title or author" onChange={event => handleChangeDebounced(event.target.value.trim())} />
                     </div>
                 </div>
                 <div className="search-books-results">

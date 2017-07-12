@@ -5,31 +5,29 @@ import * as BooksAPI from "../BooksAPI";
 import BookShelf from "../components/BookShelf";
 
 class HomePage extends React.Component {
-    constructor() {
-        super();
-        this.state = {
-            books: []
-        };
-        this.changeShelf = this.changeShelf.bind(this);
+    state = {
+        books: []
     }
 
-    componentDidMount() {
-        BooksAPI.getAll().then((books) => {
-            this.setState({books});
-        });
-    }
-
-    changeShelf(book, newShelf) {
+    changeShelf = (book, newShelf) => {
         const bookId = book.id;
         BooksAPI.update(book, newShelf).then(() => {
             this.setState(oldState => {
-                return {books: oldState.books.map(book => {
-                    if (book.id === bookId) {
-                        book.shelf = newShelf;
-                    }
-                    return book;
-                })};
+                return {
+                    books: oldState.books.map(book => {
+                        if (book.id === bookId) {
+                            book.shelf = newShelf;
+                        }
+                        return book;
+                    })
+                };
             });
+        });
+    }
+
+    componentDidMount() {
+        BooksAPI.getAll().then(books => {
+            this.setState({books});
         });
     }
 
