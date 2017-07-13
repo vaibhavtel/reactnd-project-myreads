@@ -24,6 +24,8 @@ class SearchPage extends React.Component {
                             const isBookOnShelf = this.isBookOnShelf(book.id);
                             if (isBookOnShelf.length) {
                                 book.shelf = isBookOnShelf[0].shelf;
+                            } else {
+                                book.shelf = "none";
                             }
                             return book;
                         })
